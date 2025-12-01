@@ -137,7 +137,13 @@ struct EstimateView: View {
                     .tag(system.id)
                 }
                 .onDelete { indexSet in
-                    indexSet.map { estimateVM.currentEstimate.systems[$0].id }.forEach(estimateVM.removeSystem)
+                    // Collect IDs safely first, then delete
+                    let systemsArray = estimateVM.currentEstimate.systems
+                    let idsToDelete: [UUID] = indexSet.compactMap { idx -> UUID? in
+                        guard idx < systemsArray.count else { return nil }
+                        return systemsArray[idx].id
+                    }
+                    idsToDelete.forEach(estimateVM.removeSystem)
                 }
             }
             
@@ -157,8 +163,14 @@ struct EstimateView: View {
                             .bold()
                     }
                 }
-                .onDelete { set in
-                    set.map { estimateVM.currentEstimate.addOns[$0].id }.forEach(estimateVM.removeAddOn)
+                .onDelete { indexSet in
+                    // Collect IDs safely first, then delete
+                    let addOnsArray = estimateVM.currentEstimate.addOns
+                    let idsToDelete: [UUID] = indexSet.compactMap { idx -> UUID? in
+                        guard idx < addOnsArray.count else { return nil }
+                        return addOnsArray[idx].id
+                    }
+                    idsToDelete.forEach(estimateVM.removeAddOn)
                 }
                 
                 Button {

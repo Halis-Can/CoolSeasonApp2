@@ -28,46 +28,39 @@ struct SystemTemplatesListView: View {
             .pickerStyle(.segmented)
             .frame(maxWidth: 700)
             
-            ScrollView {
-                VStack(spacing: 0) {
-                    ForEach(filteredTemplates) { tmpl in
-                        Button {
-                            editingItem = SheetItem(id: tmpl.id)
-                        } label: {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(tmpl.name)
-                                        .font(.headline)
-                                        .foregroundStyle(.primary)
-                                    Text("\(capacityLabel(for: tmpl)) • \(tmpl.equipmentType.rawValue) • \(tiersSummary(tmpl))")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                                Spacer()
-                                
-                                Button(role: .destructive) {
-                                    settingsVM.systemTemplates.removeAll { $0.id == tmpl.id }
-                                } label: {
-                                    Image(systemName: "trash")
-                                }
-                                .buttonStyle(.bordered)
-                                .controlSize(.small)
-                                .simultaneousGesture(TapGesture().onEnded {
-                                    // Prevent row tap when delete is pressed
-                                })
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
-                            .background(Color(uiColor: .systemBackground))
-                            .contentShape(Rectangle())
+            List {
+                ForEach(filteredTemplates) { tmpl in
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(tmpl.name)
+                                .font(.headline)
+                            Text("\(capacityLabel(for: tmpl)) • \(tmpl.equipmentType.rawValue) • \(tiersSummary(tmpl))")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
-                        .buttonStyle(.plain)
-                        
-                        Divider()
+                        Spacer()
+                        Button(role: .destructive) {
+                            settingsVM.systemTemplates.removeAll { $0.id == tmpl.id }
+                        } label: {
+                            Image(systemName: "trash")
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        editingItem = SheetItem(id: tmpl.id)
                     }
                 }
-                .background(Color(uiColor: .systemGroupedBackground))
-                .cornerRadius(10)
+                .onDelete { indexSet in
+                    // Collect IDs safely first, then delete
+                    let templatesArray = filteredTemplates
+                    let idsToDelete: [UUID] = indexSet.compactMap { idx -> UUID? in
+                        guard idx < templatesArray.count else { return nil }
+                        return templatesArray[idx].id
+                    }
+                    settingsVM.systemTemplates.removeAll { idsToDelete.contains($0.id) }
+                }
             }
             .frame(maxWidth: 900)
         }

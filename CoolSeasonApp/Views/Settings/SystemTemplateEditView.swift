@@ -136,9 +136,6 @@ struct SystemTemplateEditView: View {
                 Button("Save") { dismiss() }
             }
         }
-        .onAppear {
-            autoFillModelsAndWarranty()
-        }
     }
     
     // Auto-fill missing model numbers (5 letters + numeric tag) and warranty text

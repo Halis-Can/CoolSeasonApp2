@@ -20,9 +20,7 @@ struct FinalSummaryView: View {
             if enabledSystems.count > 1 {
                 // Multi-system: show per-system paged summaries, then a totals page
                 TabView {
-                    ForEach(Array(enabledSystems.enumerated()), id: \.element.id) { pair in
-                        let idx = pair.offset
-                        let sys = pair.element
+                    ForEach(Array(enabledSystems.enumerated()), id: \.element.id) { idx, sys in
                         ScrollView {
                             VStack(alignment: .leading, spacing: 24) {
                                 Text("Estimate").font(.largeTitle.bold())
@@ -642,9 +640,7 @@ struct FinalSummaryView: View {
     private func tierTotalsColumn(title: String, tier: Tier, color: Color) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title).font(.headline)
-            ForEach(Array(enabledSystems.enumerated()), id: \.element.id) { pair in
-                let idx = pair.offset
-                let sys = pair.element
+            ForEach(Array(enabledSystems.enumerated()), id: \.element.id) { idx, sys in
                 VStack(alignment: .leading, spacing: 4) {
                     Text("\(idx + 1). System").font(.subheadline).bold()
                     // System price line

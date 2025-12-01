@@ -273,8 +273,7 @@ private struct SystemsSetupScreen: View {
                 }
             }
             
-            ForEach(estimateVM.currentEstimate.systems.indices, id: \.self) { idx in
-                let system = estimateVM.currentEstimate.systems[idx]
+            ForEach(Array(estimateVM.currentEstimate.systems.enumerated()), id: \.element.id) { idx, system in
                 Section("\(idx + 1). System") {
                     TextField("System name", text: Binding(
                         get: { system.name },
@@ -349,9 +348,6 @@ private struct SystemsSetupScreen: View {
                         Picker("Furnace BTU", selection: Binding(
                             get: { system.furnaceBTU ?? 70000 },
                             set: { newVal in
-                                var updated = system
-                                updated.furnaceBTU = newVal
-                                estimateVM.updateSystemMeta(system.id, tonnage: system.tonnage) // trigger persist
                                 if let idx = estimateVM.currentEstimate.systems.firstIndex(where: { $0.id == system.id }) {
                                     estimateVM.currentEstimate.systems[idx].furnaceBTU = newVal
                                     onChange(system.id)
@@ -586,9 +582,7 @@ private struct AdditionalEquipmentScreen: View {
     
     var body: some View {
         Form {
-            ForEach(Array(estimateVM.currentEstimate.systems.enumerated()), id: \.element.id) { pair in
-                let sidx = pair.offset
-                let system = pair.element
+            ForEach(Array(estimateVM.currentEstimate.systems.enumerated()), id: \.element.id) { sidx, system in
                 Section("\(sidx + 1). System – \(system.name)") {
                     let items = estimateVM.currentEstimate.addOns.filter { $0.systemId == system.id }
                     ForEach(items, id: \.id) { addon in
