@@ -17,6 +17,10 @@ struct MainTabView: View {
                 .tabItem {
                     Label("AC Size Assistant", systemImage: "thermometer")
                 }
+            CompareView()
+                .tabItem {
+                    Label("Compare", systemImage: "snowflake")
+                }
             SystemSettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gearshape")

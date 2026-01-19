@@ -175,7 +175,12 @@ struct AddOnTemplateCreator: View {
 
 private let currencyFormatter: NumberFormatter = {
     let f = NumberFormatter()
-    f.numberStyle = .currency
+    // Use plain decimal for easier editing; we still show currency elsewhere with formatCurrency(_:)
+    f.numberStyle = .decimal
+    f.minimumFractionDigits = 0
+    f.maximumFractionDigits = 2
+    f.usesGroupingSeparator = false
+    f.locale = .current
     return f
 }()
 

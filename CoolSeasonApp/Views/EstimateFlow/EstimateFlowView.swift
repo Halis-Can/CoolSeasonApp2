@@ -243,7 +243,15 @@ private struct CustomerInfoScreen: View {
 private let allowedTonnages: [Double] = [1.5,2,2.5,3,3.5,4,4.5,5,5.5]
 private let furnaceBTUOptions: [Int] = [40000, 45000, 60000, 70000, 80000, 90000, 100000, 110000]
 private let flowAllowedEquipmentTypes: [EquipmentType] = [
-    .acCondenserOnly, .coilOnly, .acCondenserCoil, .acCondenserCoilFurnace, .acFurnace, .heatPumpOnly, .airHandlerOnly, .heatPumpAirHandler, .furnaceOnly
+    .acCondenserOnly,
+    .coilOnly,
+    .furnaceOnly,
+    .acCondenserCoil,
+    .acCondenserCoilFurnace,
+    .acFurnace,
+    .heatPumpOnly,
+    .airHandlerOnly,
+    .heatPumpAirHandler
 ]
 
 private struct SystemsSetupScreen: View {

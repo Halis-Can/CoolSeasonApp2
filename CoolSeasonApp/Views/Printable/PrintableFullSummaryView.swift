@@ -100,9 +100,9 @@ struct PrintableSystemPage: View {
     
     private func seriesLabel(_ t: Tier) -> String {
         switch t {
-        case .good: return "Comfortable Series"
-        case .better: return "Performance Series"
-        case .best: return "Infinity Series"
+        case .good: return "Good"
+        case .better: return "Better"
+        case .best: return "Best"
         }
     }
     private func formatSystemCapacity(_ sys: EstimateSystem) -> String {
@@ -127,9 +127,9 @@ struct PrintableTotalsComparisonPage: View {
             customerBlock
             Text("Proposal Totals by Series").font(.headline)
             HStack(alignment: .top, spacing: 12) {
-                column(title: "Comfortable Series", tier: .good, color: .blue)
-                column(title: "Performance Series", tier: .better, color: .purple)
-                column(title: "Infinity Series", tier: .best, color: .pink)
+                column(title: "Good", tier: .good, color: .blue)
+                column(title: "Better", tier: .better, color: .purple)
+                column(title: "Best", tier: .best, color: .pink)
             }
         }
         .padding(16)

@@ -16,9 +16,9 @@ enum Tier: String, CaseIterable, Identifiable, Codable {
     
     var displayName: String {
         switch self {
-        case .good: return "Comfortable"
-        case .better: return "Performance"
-        case .best: return "Infinity"
+        case .good: return "Good"
+        case .better: return "Better"
+        case .best: return "Best"
         }
     }
 }

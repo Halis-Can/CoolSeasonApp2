@@ -38,9 +38,9 @@ struct PrintableSummaryView: View {
             }
             // Proposal Cards in three columns if space allows; print layout: vertical stack
             VStack(alignment: .leading, spacing: 12) {
-                ProposalCard(tier: .good, title: "Comfortable Series", estimate: estimate, color: .blue)
-                ProposalCard(tier: .better, title: "Performance Series", estimate: estimate, color: .purple)
-                ProposalCard(tier: .best, title: "Infinity Series", estimate: estimate, color: .pink)
+                ProposalCard(tier: .good, title: "Good", estimate: estimate, color: .blue)
+                ProposalCard(tier: .better, title: "Better", estimate: estimate, color: .purple)
+                ProposalCard(tier: .best, title: "Best", estimate: estimate, color: .pink)
             }
             // Signature small box
             HStack {

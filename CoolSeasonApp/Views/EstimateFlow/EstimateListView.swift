@@ -21,6 +21,7 @@ struct EstimateListView: View {
                         .textFieldStyle(.roundedBorder)
                     Button {
                         estimateVM.createNewEstimate()
+                        startAtSummary = false
                         navigateToFlow = true
                     } label: {
                         Label("New Estimate", systemImage: "plus.circle.fill")

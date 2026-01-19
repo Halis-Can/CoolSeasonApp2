@@ -7,11 +7,10 @@ import SwiftUI
 
 struct ACSizeAssistantView: View {
     enum Step: Hashable {
-        case compare, zone, floors, results
+        case zone, floors, results
         
         var title: String {
             switch self {
-            case .compare: return "Compare"
             case .zone: return "Climate Zone"
             case .floors: return "Floors & Loads"
             case .results: return "Results"
@@ -20,7 +19,6 @@ struct ACSizeAssistantView: View {
         
         var systemImage: String {
             switch self {
-            case .compare: return "rectangle.3.group"
             case .zone: return "globe.americas"
             case .floors: return "building.2"
             case .results: return "list.bullet.rectangle.portrait"
@@ -29,16 +27,13 @@ struct ACSizeAssistantView: View {
     }
     
     @StateObject var viewModel = AppStateViewModel()
-    @State private var selection: Step? = .compare
+    @State private var selection: Step? = .zone
     
     var body: some View {
         if #available(iOS 16.0, *) {
             NavigationSplitView {
                 List(selection: $selection) {
                     Section("AC Size Assistant") {
-                        NavigationLink(value: Step.compare) {
-                            Label(Step.compare.title, systemImage: Step.compare.systemImage)
-                        }
                         NavigationLink(value: Step.zone) {
                             Label(Step.zone.title, systemImage: Step.zone.systemImage)
                         }
@@ -54,10 +49,7 @@ struct ACSizeAssistantView: View {
             } detail: {
                 Group {
                     switch selection {
-                    case .compare, .none:
-                        CompareView()
-                            .navigationTitle(Step.compare.title)
-                    case .zone:
+                    case .zone, .none:
                         ZoneSelectionView(onNext: { selection = .floors })
                             .environmentObject(viewModel)
                             .navigationTitle("AC Size Assistant")
@@ -80,9 +72,6 @@ struct ACSizeAssistantView: View {
             NavigationView {
                 List {
                     Section("AC Size Assistant") {
-                        NavigationLink(destination: CompareView().navigationTitle(Step.compare.title)) {
-                            Label(Step.compare.title, systemImage: Step.compare.systemImage)
-                        }
                         NavigationLink(destination: ZoneSelectionView(onNext: {}).environmentObject(viewModel).navigationTitle("AC Size Assistant")) {
                             Label(Step.zone.title, systemImage: Step.zone.systemImage)
                         }

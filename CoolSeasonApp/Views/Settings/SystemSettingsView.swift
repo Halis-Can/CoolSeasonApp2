@@ -26,14 +26,6 @@ struct SystemSettingsView: View {
             VStack(spacing: 16) {
                 AppLogoHeader()
                 List {
-                    Section("Appearance") {
-                        Picker("Theme", selection: $settingsVM.themeMode) {
-                            ForEach(SettingsViewModel.ThemeMode.allCases) { mode in
-                                Text(mode.title).tag(mode)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                    }
                     Section {
                         NavigationLink {
                             SystemTemplatesListView()
@@ -47,6 +39,21 @@ struct SystemSettingsView: View {
                         } label: {
                             Label("Additional Equipment Templates", systemImage: "wrench.and.screwdriver")
                         }
+                    }
+                    Section {
+                        NavigationLink {
+                            FinanceSettingsView()
+                        } label: {
+                            Label("Finance", systemImage: "creditcard")
+                        }
+                    }
+                    Section("Appearance") {
+                        Picker("Theme", selection: $settingsVM.themeMode) {
+                            ForEach(SettingsViewModel.ThemeMode.allCases) { mode in
+                                Text(mode.title).tag(mode)
+                            }
+                        }
+                        .pickerStyle(.segmented)
                     }
                 }
                 .frame(maxWidth: 900)

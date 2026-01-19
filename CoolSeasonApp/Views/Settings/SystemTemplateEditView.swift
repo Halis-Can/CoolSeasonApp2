@@ -18,8 +18,6 @@ struct SystemTemplateEditView: View {
     
     var body: some View {
         VStack(spacing: 16) {
-            AppLogoHeader()
-            
             // Context header: show selected equipment type and size
             VStack(spacing: 2) {
                 Text(displayName(for: systemTemplate.equipmentType))
@@ -108,7 +106,7 @@ struct SystemTemplateEditView: View {
                     }
                 } header: {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Options (Comfortable / Performance / Infinity)")
+                        Text("Options (Good / Better / Best)")
                         Text("\(displayName(for: systemTemplate.equipmentType)) • \(currentCapacityLabel(systemTemplate))")
                             .font(.caption)
                             .foregroundStyle(.secondary)

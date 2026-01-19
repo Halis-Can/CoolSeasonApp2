@@ -94,7 +94,7 @@ struct SystemTemplatesListView: View {
                     SystemTemplateEditView(systemTemplate: binding)
                         .environmentObject(settingsVM)
                 }
-                .presentationDetents([.fraction(0.75), .large])
+                .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
             } else {
                 VStack {

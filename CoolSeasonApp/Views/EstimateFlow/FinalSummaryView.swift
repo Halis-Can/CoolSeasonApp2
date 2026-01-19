@@ -23,6 +23,7 @@ struct FinalSummaryView: View {
                     ForEach(Array(enabledSystems.enumerated()), id: \.element.id) { idx, sys in
                         ScrollView {
                             VStack(alignment: .leading, spacing: 24) {
+                                companySection
                                 Text("Estimate").font(.largeTitle.bold())
                                 customerSection
                                 SystemSummaryPage(system: sys, index: idx)
@@ -37,6 +38,7 @@ struct FinalSummaryView: View {
                     // Final totals page
                     ScrollView {
                         VStack(alignment: .leading, spacing: 24) {
+                            companySection
                             Text("Estimate Totals").font(.largeTitle.bold())
                             customerSection
                             totalsComparisonSection
@@ -53,6 +55,7 @@ struct FinalSummaryView: View {
                 // Single-system: keep consolidated layout
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
+                        companySection
                         Text("Estimate")
                             .font(.largeTitle.bold())
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -129,6 +132,14 @@ struct FinalSummaryView: View {
         .buttonStyle(.borderedProminent)
     }
     
+    private var companySection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("CoolSeason HVAC")
+                .font(.headline)
+            // You can customize more company details here if needed (phone, email, license, etc.)
+        }
+    }
+    
     private var customerSection: some View {
         HStack(alignment: .top, spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
@@ -175,7 +186,7 @@ struct FinalSummaryView: View {
         }
     }
     
-    // MARK: - Proposal Options (3-column boxes for Comfortable / Performance / Infinity)
+    // MARK: - Proposal Options (3-column boxes for Good / Better / Best)
     
     private var proposalOptionsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -204,9 +215,9 @@ struct FinalSummaryView: View {
     
     private func label(for tier: Tier) -> String {
         switch tier {
-        case .good: return "Comfortable Series"
-        case .better: return "Performance Series"
-        case .best: return "Infinity Series"
+        case .good: return "Good"
+        case .better: return "Better"
+        case .best: return "Best"
         }
     }
     
@@ -214,6 +225,8 @@ struct FinalSummaryView: View {
         let tier: Tier
         let label: String
         @EnvironmentObject var estimateVM: EstimateViewModel
+        @AppStorage("finance_rate_percent") private var financeRatePercent: Double = 0.0
+        @AppStorage("finance_term_months") private var financeTermMonths: Int = 12
         
         var body: some View {
             let items = systemsWithOption
@@ -304,6 +317,11 @@ struct FinalSummaryView: View {
                     Spacer()
                     Text(formatCurrency(totalIncludingAddOns)).font(.title3.bold())
                 }
+                HStack {
+                    Text("Monthly Payment")
+                    Spacer()
+                    Text(monthlyPaymentText).font(.subheadline.bold())
+                }
                 Button {
                     estimateVM.acceptProposal(tier: tier)
                 } label: {
@@ -352,6 +370,15 @@ struct FinalSummaryView: View {
         
         private var totalIncludingAddOns: Double {
             optionSum + addOnsSubtotal
+        }
+        
+        private var monthlyPaymentText: String {
+            guard let value = financeMonthlyPayment(total: totalIncludingAddOns,
+                                                    ratePercent: financeRatePercent,
+                                                    termMonths: financeTermMonths) else {
+                return "—"
+            }
+            return formatCurrency(value)
         }
         
         private var imageNames: [String] {
@@ -417,9 +444,9 @@ struct FinalSummaryView: View {
         
         private func label(for tier: Tier) -> String {
             switch tier {
-            case .good: return "Comfortable Series"
-            case .better: return "Performance Series"
-            case .best: return "Infinity Series"
+            case .good: return "Good"
+            case .better: return "Better"
+            case .best: return "Best"
             }
         }
         
@@ -446,6 +473,8 @@ struct FinalSummaryView: View {
         let tier: Tier
         let accent: Color
         @EnvironmentObject var estimateVM: EstimateViewModel
+        @AppStorage("finance_rate_percent") private var financeRatePercent: Double = 0.0
+        @AppStorage("finance_term_months") private var financeTermMonths: Int = 12
         
         var body: some View {
             VStack(alignment: .leading, spacing: 8) {
@@ -501,7 +530,12 @@ struct FinalSummaryView: View {
                     HStack {
                         Text("Total").bold()
                         Spacer()
-                        Text(formatCurrency(opt.price + addOnsSubtotal)).bold()
+                        Text(formatCurrency(totalWithAddOns)).bold()
+                    }
+                    HStack {
+                        Text("Monthly Payment")
+                        Spacer()
+                        Text(monthlyPaymentText).bold()
                     }
                 } else {
                     Text("No option available").font(.caption).foregroundStyle(.secondary)
@@ -523,6 +557,18 @@ struct FinalSummaryView: View {
             }
             return total
         }
+        private var totalWithAddOns: Double {
+            (option?.price ?? 0) + addOnsSubtotal
+        }
+        
+        private var monthlyPaymentText: String {
+            guard let value = financeMonthlyPayment(total: totalWithAddOns,
+                                                    ratePercent: financeRatePercent,
+                                                    termMonths: financeTermMonths) else {
+                return "—"
+            }
+            return formatCurrency(value)
+        }
         private var enabledAddOnsForSystem: [AddOn] {
             var items: [AddOn] = []
             for a in estimateVM.currentEstimate.addOns {
@@ -533,9 +579,9 @@ struct FinalSummaryView: View {
         
         private func seriesLabel(_ t: Tier) -> String {
             switch t {
-            case .good: return "Comfortable Series"
-            case .better: return "Performance Series"
-            case .best: return "Infinity Series"
+            case .good: return "Good"
+            case .better: return "Better"
+            case .best: return "Best"
             }
         }
         
@@ -630,9 +676,9 @@ struct FinalSummaryView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Proposal Totals by Series").font(.title2).bold()
             HStack(alignment: .top, spacing: 12) {
-                tierTotalsColumn(title: "Comfortable Series", tier: .good, color: .blue)
-                tierTotalsColumn(title: "Performance Series", tier: .better, color: .purple)
-                tierTotalsColumn(title: "Infinity Series", tier: .best, color: .pink)
+                tierTotalsColumn(title: "Good", tier: .good, color: .blue)
+                tierTotalsColumn(title: "Better", tier: .better, color: .purple)
+                tierTotalsColumn(title: "Best", tier: .best, color: .pink)
             }
         }
     }
@@ -749,4 +795,17 @@ struct FinalSummaryView: View {
     }
 }
 
+// MARK: - Finance helpers (file-private)
+private func financeMonthlyPayment(total: Double, ratePercent: Double, termMonths: Int) -> Double? {
+    guard total > 0, termMonths > 0 else { return nil }
+    let n = Double(termMonths)
+    let monthlyRate = ratePercent / 100.0 / 12.0
+    if monthlyRate <= 0 {
+        // No interest: simple division
+        return total / n
+    }
+    let denominator = 1 - pow(1 + monthlyRate, -n)
+    guard denominator != 0 else { return nil }
+    return total * monthlyRate / denominator
+}
 
