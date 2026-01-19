@@ -12,7 +12,6 @@ struct AddOnTemplatesView: View {
     
     var body: some View {
         VStack(spacing: 16) {
-            AppLogoHeader()
             List {
                 ForEach(settingsVM.addOnTemplates) { tmpl in
                     HStack(spacing: 12) {

@@ -47,6 +47,13 @@ struct SystemSettingsView: View {
                             Label("Finance", systemImage: "creditcard")
                         }
                     }
+                    Section {
+                        NavigationLink {
+                            CompanyInfoSettingsView()
+                        } label: {
+                            Label("Company Information", systemImage: "building.2")
+                        }
+                    }
                     Section("Appearance") {
                         Picker("Theme", selection: $settingsVM.themeMode) {
                             ForEach(SettingsViewModel.ThemeMode.allCases) { mode in

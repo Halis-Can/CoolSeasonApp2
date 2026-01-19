@@ -72,12 +72,11 @@ struct EstimateFlowView: View {
                     }
                 case .summary:
                     CenteredScreen {
-                        AppLogoHeader()
                         FinalSummaryView(back: goBack)
                     }
                 }
             }
-            .navigationTitle(step.title)
+            .navigationTitle(step == .summary ? "" : step.title)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     if step != .customer {

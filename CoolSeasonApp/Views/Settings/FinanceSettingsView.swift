@@ -8,13 +8,12 @@ import SwiftUI
 struct FinanceSettingsView: View {
     @AppStorage("finance_rate_percent") private var financeRatePercent: Double = 0.0
     @AppStorage("finance_term_months") private var financeTermMonths: Int = 12
+    @AppStorage("finance_markup_percent") private var financeMarkupPercent: Double = 0.0
     
     private let availableTerms: [Int] = [12, 36, 60]
     
     var body: some View {
         VStack(spacing: 16) {
-            AppLogoHeader()
-            
             Form {
                 Section("Finance Rate") {
                     HStack {
@@ -37,6 +36,20 @@ struct FinanceSettingsView: View {
                         }
                     }
                     .pickerStyle(.segmented)
+                }
+                
+                Section("Total Rate") {
+                    HStack {
+                        Text("Total Rate (%)")
+                        Spacer()
+                        TextField("0", value: $financeMarkupPercent, formatter: decimalFormatter)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                            .frame(maxWidth: 120)
+                    }
+                    Text("Percentage applied on top of totals (Estimate & Final Summary).")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
             .frame(maxWidth: 700)

@@ -11,6 +11,7 @@ import MessageUI
 struct EstimateView: View {
     @EnvironmentObject var settingsVM: SettingsViewModel
     @EnvironmentObject var estimateVM: EstimateViewModel
+    @AppStorage("finance_markup_percent") private var financeMarkupPercent: Double = 0.0
     @State private var showingAddOnSheet: Bool = false
     @State private var showingActivity: Bool = false
     @State private var showingMail: Bool = false
@@ -195,7 +196,9 @@ struct EstimateView: View {
                     Text("Grand Total")
                         .bold()
                     Spacer()
-                    Text(formatCurrency(estimateVM.currentEstimate.grandTotal))
+                    let factor = 1 + (financeMarkupPercent / 100.0)
+                    let totalWithMarkup = estimateVM.currentEstimate.grandTotal * factor
+                    Text(formatCurrency(totalWithMarkup))
                         .bold()
                 }
             }

@@ -18,8 +18,6 @@ struct SystemTemplatesListView: View {
     
     var body: some View {
         VStack(spacing: 16) {
-            AppLogoHeader()
-            
             Picker("Category", selection: $selectedType) {
                 ForEach(categories) { t in
                     Text(displayName(for: t)).tag(t)

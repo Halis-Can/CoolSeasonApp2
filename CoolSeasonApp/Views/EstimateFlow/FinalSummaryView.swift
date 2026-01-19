@@ -8,6 +8,13 @@ import MessageUI
 
 struct FinalSummaryView: View {
     @EnvironmentObject var estimateVM: EstimateViewModel
+    @AppStorage("finance_markup_percent") private var financeMarkupPercent: Double = 0.0
+    @AppStorage("company_name") private var companyName: String = "CoolSeason HVAC"
+    @AppStorage("company_phone") private var companyPhone: String = ""
+    @AppStorage("company_email") private var companyEmail: String = ""
+    @AppStorage("company_address") private var companyAddress: String = ""
+    @AppStorage("company_license") private var companyLicense: String = ""
+    @AppStorage("company_website") private var companyWebsite: String = ""
     @State private var showingActivity = false
     @State private var showingMail = false
     @State private var showingMessage = false
@@ -23,8 +30,7 @@ struct FinalSummaryView: View {
                     ForEach(Array(enabledSystems.enumerated()), id: \.element.id) { idx, sys in
                         ScrollView {
                             VStack(alignment: .leading, spacing: 24) {
-                                companySection
-                                Text("Estimate").font(.largeTitle.bold())
+                                headerView(title: "Estimate")
                                 customerSection
                                 SystemSummaryPage(system: sys, index: idx)
                                 signatureSection
@@ -38,8 +44,7 @@ struct FinalSummaryView: View {
                     // Final totals page
                     ScrollView {
                         VStack(alignment: .leading, spacing: 24) {
-                            companySection
-                            Text("Estimate Totals").font(.largeTitle.bold())
+                            headerView(title: "Estimate Totals")
                             customerSection
                             totalsComparisonSection
                             signatureSection
@@ -55,10 +60,7 @@ struct FinalSummaryView: View {
                 // Single-system: keep consolidated layout
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
-                        companySection
-                        Text("Estimate")
-                            .font(.largeTitle.bold())
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        headerView(title: "Estimate")
                         customerSection
                         if let only = enabledSystems.first {
                             SystemSummaryPage(system: only, index: 0)
@@ -121,6 +123,25 @@ struct FinalSummaryView: View {
         estimateVM.currentEstimate.systems.filter { $0.enabled }
     }
     
+    private func headerView(title: String) -> some View {
+        HStack(alignment: .center, spacing: 16) {
+            // Logo on the top-left
+            AppLogoHeader(height: 60)
+                .frame(maxWidth: 200, alignment: .leading)
+            
+            Spacer()
+            
+            // Estimate meta on the right
+            VStack(alignment: .trailing, spacing: 2) {
+                Text("Estimate # \(estimateVM.currentEstimate.estimateNumber.isEmpty ? "—" : estimateVM.currentEstimate.estimateNumber)")
+                    .font(.headline)
+                Text(estimateVM.currentEstimate.estimateDate.formatted(date: .abbreviated, time: .omitted))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+    
     private var shareButton: some View {
         Button {
             generatePDF()
@@ -132,46 +153,55 @@ struct FinalSummaryView: View {
         .buttonStyle(.borderedProminent)
     }
     
-    private var companySection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("CoolSeason HVAC")
-                .font(.headline)
-            // You can customize more company details here if needed (phone, email, license, etc.)
-        }
-    }
-    
     private var customerSection: some View {
-        HStack(alignment: .top, spacing: 16) {
-            VStack(alignment: .leading, spacing: 4) {
+        HStack(alignment: .top, spacing: 24) {
+            // Company info on the left
+            VStack(alignment: .leading, spacing: 6) {
+                if !companyName.isEmpty {
+                    Text(companyName)
+                        .font(.title2.bold())
+                }
+                if !companyAddress.isEmpty {
+                    Text(companyAddress)
+                        .font(.subheadline)
+                }
+                if !companyLicense.isEmpty {
+                    Text("Lic: \(companyLicense)")
+                        .font(.subheadline)
+                }
+                if !companyPhone.isEmpty {
+                    HStack(spacing: 6) {
+                        Image(systemName: "phone.fill")
+                        Text(companyPhone)
+                    }
+                    .font(.subheadline)
+                }
+                if !companyEmail.isEmpty {
+                    HStack(spacing: 6) {
+                        Image(systemName: "envelope.fill")
+                        Text(companyEmail)
+                    }
+                    .font(.subheadline)
+                }
+                if !companyWebsite.isEmpty {
+                    HStack(spacing: 6) {
+                        Image(systemName: "globe")
+                        Text(companyWebsite.lowercased())
+                    }
+                    .font(.subheadline)
+                }
+            }
+            
+            Spacer()
+            
+            // Customer info on the right (no SF Symbols)
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Customer").font(.title2).bold()
                 LabeledRow(label: "Name:", value: estimateVM.currentEstimate.customerName)
                 LabeledRow(label: "Address:", value: estimateVM.currentEstimate.address)
                 LabeledRow(label: "Phone:", value: estimateVM.currentEstimate.phone)
                 LabeledRow(label: "Email:", value: estimateVM.currentEstimate.email)
             }
-            Spacer()
-            VStack(alignment: .leading, spacing: 8) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Estimate #").font(.caption).foregroundStyle(.secondary)
-                    Text(estimateVM.currentEstimate.estimateNumber.isEmpty ? "—" : estimateVM.currentEstimate.estimateNumber)
-                        .font(.title2.bold())
-                }
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Date").font(.caption).foregroundStyle(.secondary)
-                    Text(estimateVM.currentEstimate.estimateDate.formatted(date: .abbreviated, time: .omitted))
-                        .font(.title3)
-                }
-            }
-            .padding(12)
-            .frame(minWidth: 220)
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(.systemBackground))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.black, lineWidth: 2)
-            )
         }
     }
     
@@ -227,6 +257,7 @@ struct FinalSummaryView: View {
         @EnvironmentObject var estimateVM: EstimateViewModel
         @AppStorage("finance_rate_percent") private var financeRatePercent: Double = 0.0
         @AppStorage("finance_term_months") private var financeTermMonths: Int = 12
+        @AppStorage("finance_markup_percent") private var financeMarkupPercent: Double = 0.0
         
         var body: some View {
             let items = systemsWithOption
@@ -266,11 +297,6 @@ struct FinalSummaryView: View {
                             }
                             if let m = opt.furnaceModel, !m.isEmpty {
                                 Text("Furnace: \(m)").font(.caption).foregroundStyle(.secondary)
-                            }
-                            // Price at the bottom of sub-box
-                            HStack {
-                                Spacer()
-                                Text(formatCurrency(opt.price)).font(.subheadline.bold())
                             }
                         }
                         .padding(6)
@@ -315,12 +341,23 @@ struct FinalSummaryView: View {
                 HStack {
                     Text("Total Investment").bold()
                     Spacer()
-                    Text(formatCurrency(totalIncludingAddOns)).font(.title3.bold())
+                    Text(formatCurrency(totalWithMarkup)).font(.title3.bold())
                 }
-                HStack {
+                VStack(alignment: .leading, spacing: 4) {
                     Text("Monthly Payment")
-                    Spacer()
-                    Text(monthlyPaymentText).font(.subheadline.bold())
+                        .font(.subheadline)
+                    HStack {
+                        Text("\(financeTermMonths) months")
+                        Spacer()
+                        Text(monthlyPaymentText)
+                            .font(.subheadline.bold())
+                    }
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 10)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.accentColor.opacity(0.6), lineWidth: 1)
+                    )
                 }
                 Button {
                     estimateVM.acceptProposal(tier: tier)
@@ -372,8 +409,13 @@ struct FinalSummaryView: View {
             optionSum + addOnsSubtotal
         }
         
+        private var totalWithMarkup: Double {
+            let factor = 1 + (financeMarkupPercent / 100.0)
+            return totalIncludingAddOns * factor
+        }
+        
         private var monthlyPaymentText: String {
-            guard let value = financeMonthlyPayment(total: totalIncludingAddOns,
+            guard let value = financeMonthlyPayment(total: totalWithMarkup,
                                                     ratePercent: financeRatePercent,
                                                     termMonths: financeTermMonths) else {
                 return "—"
@@ -475,6 +517,7 @@ struct FinalSummaryView: View {
         @EnvironmentObject var estimateVM: EstimateViewModel
         @AppStorage("finance_rate_percent") private var financeRatePercent: Double = 0.0
         @AppStorage("finance_term_months") private var financeTermMonths: Int = 12
+        @AppStorage("finance_markup_percent") private var financeMarkupPercent: Double = 0.0
         
         var body: some View {
             VStack(alignment: .leading, spacing: 8) {
@@ -494,12 +537,6 @@ struct FinalSummaryView: View {
                     }
                     if let m = opt.furnaceModel, !m.isEmpty {
                         Text("Furnace: \(m)").font(.caption).foregroundStyle(.secondary)
-                    }
-                    // System price just above Add-Ons, as requested
-                    HStack {
-                        Text("System")
-                        Spacer()
-                        Text(formatCurrency(opt.price)).bold()
                     }
                     // List add-ons individually for this system (smaller text to fit columns)
                     if !enabledAddOnsForSystem.isEmpty {
@@ -530,12 +567,23 @@ struct FinalSummaryView: View {
                     HStack {
                         Text("Total").bold()
                         Spacer()
-                        Text(formatCurrency(totalWithAddOns)).bold()
+                        Text(formatCurrency(totalWithMarkup)).bold()
                     }
-                    HStack {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text("Monthly Payment")
-                        Spacer()
-                        Text(monthlyPaymentText).bold()
+                            .font(.subheadline)
+                        HStack {
+                            Text("\(financeTermMonths) months")
+                            Spacer()
+                            Text(monthlyPaymentText)
+                                .font(.subheadline.bold())
+                        }
+                        .padding(.vertical, 6)
+                        .padding(.horizontal, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.accentColor.opacity(0.6), lineWidth: 1)
+                        )
                     }
                 } else {
                     Text("No option available").font(.caption).foregroundStyle(.secondary)
@@ -560,9 +608,13 @@ struct FinalSummaryView: View {
         private var totalWithAddOns: Double {
             (option?.price ?? 0) + addOnsSubtotal
         }
+        private var totalWithMarkup: Double {
+            let factor = 1 + (financeMarkupPercent / 100.0)
+            return totalWithAddOns * factor
+        }
         
         private var monthlyPaymentText: String {
-            guard let value = financeMonthlyPayment(total: totalWithAddOns,
+            guard let value = financeMonthlyPayment(total: totalWithMarkup,
                                                     ratePercent: financeRatePercent,
                                                     termMonths: financeTermMonths) else {
                 return "—"
@@ -665,7 +717,9 @@ struct FinalSummaryView: View {
                 Text("Total Investment")
                     .bold()
                 Spacer()
-                Text(formatCurrency(estimateVM.currentEstimate.grandTotal))
+                let factor = 1 + (financeMarkupPercent / 100.0)
+                let totalWithMarkup = estimateVM.currentEstimate.grandTotal * factor
+                Text(formatCurrency(totalWithMarkup))
                     .bold()
             }
         }
